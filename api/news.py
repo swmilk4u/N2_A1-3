@@ -22,8 +22,8 @@ class handler(BaseHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
         self.end_headers()
 
-        # 구글 뉴스 실시간 RSS 피드 URL (검색어: 이직 창업 커리어)
-        url = "https://news.google.com/rss/search?q=%EC%9D%B4%EC%A7%81+%EC%B0%BD%EC%97%85+%EC%BB%A4%EB%A6%AC%EC%96%B4&hl=ko&gl=KR&ceid=KR:ko"
+        # 구글 뉴스 실시간 RSS 피드 URL (검색어: 이직 OR 창업 OR 채용, 14일 이내 최신 기사)
+        url = "https://news.google.com/rss/search?q=%EC%9D%B4%EC%A7%81+OR+%EC%B0%BD%EC%97%85+OR+%EC%B2%B4%EC%9A%A9+when:14d&hl=ko&gl=KR&ceid=KR:ko"
 
         try:
             # 1. SSL 인증서 만료 및 불일치 에러 우회를 위한 미인증 컨텍스트 생성
