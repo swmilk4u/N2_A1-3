@@ -5,7 +5,7 @@ from google import genai
 from google.genai import types
 
 # 🌟 Load environment variables from .env if present (self-sufficient backend loading)
-env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../.env')
+env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../.env')
 if os.path.exists(env_path):
     with open(env_path, 'r', encoding='utf-8') as f:
         for line in f:
@@ -86,7 +86,7 @@ class handler(BaseHTTPRequestHandler):
             )
             
             response = client.models.generate_content(
-                model='gemini-1.5-flash',
+                model='gemini-3.5-flash',
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     system_instruction=system_instruction,

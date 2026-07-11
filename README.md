@@ -52,7 +52,7 @@
   * **🚀 포트폴리오 빌드업 스토리라인 전략**: 보유한 스택과 경험이 돋보이게 프로젝트를 구조화하는 맞춤형 가이드 라인(Markdown 형식).
 * **AI 백엔드 연동**:
   * 프론트엔드에서 `/api/coach`로 비동기 POST 전송.
-  * Vercel Serverless Function(Python) 내부에서 `google-genai` 라이브러리를 통해 최신 **Gemini 2.5 Flash** 모델 호출.
+  * Vercel Serverless Function(Python) 내부에서 `google-genai` 라이브러리를 통해 최신 **Gemini 3.5 Flash** 모델 호출.
 
 ### ⚠️ 예외 및 실패 처리 (UX 안전장치)
 1. **빈 입력 차단**: 필수 항목 중 하나라도 비어 있거나 공백만 전송될 시, 전송을 중단하고 경고 창(Toast 및 Error Banner)을 띄워 사용자 피드백을 제공합니다.
@@ -67,8 +67,8 @@
 | 구분 | 기술 스택 | 비고 / 라이브러리 |
 | :--- | :--- | :--- |
 | **Frontend** | Pure HTML5, CSS3, Vanilla JS | 프레임워크(React/Vue 등) 미사용, CSS 변수/Media Query 반응형 적용 |
-| **Backend** | Python 3.9+ (Vercel Serverless) | `BaseHTTPRequestHandler` 기반 경량 API 라우팅 |
-| **AI Integration** | Google GenAI SDK | `google-genai` (Gemini 2.5 Flash 모델) |
+| **Backend** | Python 3.9+ (Vercel Serverless) | `BaseHTTPRequestHandler` 기반 경량 API 라우팅 (멀티스레딩 적용) |
+| **AI Integration** | Google GenAI SDK | `google-genai` (최신 플래그십 Gemini 3.5 Flash 모델) |
 | **Libraries** | Marked.js | AI의 마크다운 응답을 웹 화면에 실시간 HTML 파싱 및 바인딩 |
 | **Aesthetics** | FontAwesome 6, Google Fonts | Outfit & Inter 폰트, 프리미엄 벡터 아이콘 |
 
@@ -77,17 +77,23 @@
 ## 4. 프로젝트 구조 (Project Directory)
 
 ```text
-├── index.html               # 메인 웹 페이지 마크업
-├── requirements.txt         # 백엔드 Python 의존성 파일 (google-genai)
-├── dev_server.py            # 로컬 개발 및 통합 테스트용 간이 웹 서버
-├── css/
-│   └── style.css            # 리퀴드글래스 테마 및 반응형 레이아웃 스타일시트
-├── js/
-│   └── main.js              # 폼 검증, 비동기 API 통신, 테마 스위치, UI 제어 로직
-├── api/
-│   └── coach.py             # Vercel Serverless Function (Gemini 호출 핸들러)
-└── 01_document/
-    └── N2_A1-3 과제미션.txt # 과제 요구사항 명세서
+├── index.html               # 메인 웹 페이지 마크업 (정적 리소스 로드)
+├── vercel.json              # Vercel 서버리스 빌드 및 API 라우팅 재정의 설정 파일
+├── README.md                # 서비스 소개 및 최종보고서
+├── .gitignore               # Git 버전 관리 추적 제외 설정 파일
+├── .env                     # 로컬 전용 API 보안 환경 변수 파일
+├── 01_document/
+│   └── N2_A1-3 과제미션.txt  # 과제 요구사항 명세서
+├── 02_source/               # 모든 실행용 소스 파일 및 개발 스크립트 모음 폴더
+│   ├── requirements.txt     # 백엔드 Python 의존성 파일 (google-genai)
+│   ├── dev_server.py        # 로컬 통합 테스트용 멀티스레드(Threading) 개발 서버
+│   ├── css/
+│   │   └── style.css        # 리퀴드글래스 테마 및 반응형 레이아웃 스타일시트
+│   ├── js/
+│   │   └── main.js          # 타임아웃 60초 및 캐시 무효화가 적용된 UI 제어 로직
+│   └── api/
+│       └── coach.py         # Vercel Serverless Function (Gemini 3.5 Flash 호출 핸들러)
+└── 03_etc/                  # 비어 있는 디렉토리 (명세 요구사항용 보존)
 ```
 
 ---
@@ -99,11 +105,15 @@
 ### Step 1. 의존성 패키지 설치
 터미널을 열고 Python 패키지들을 설치해 주세요. (가상환경 사용 권장)
 ```bash
-pip install -r requirements.txt
+pip install -r 02_source/requirements.txt
 ```
 
 ### Step 2. 환경 변수 설정
-Gemini API 키를 시스템 환경 변수에 등록합니다.
+Gemini API 키를 프로젝트 루트의 `.env` 파일에 기록하거나 시스템 환경 변수에 등록합니다.
+* **프로젝트 루트의 `.env` 파일에 직접 설정**:
+  ```env
+  GEMINI_API_KEY="본인의_실제_GEMINI_API_KEY_값"
+  ```
 * **Windows (PowerShell)**:
   ```powershell
   $env:GEMINI_API_KEY="본인의_실제_GEMINI_API_KEY_값"
@@ -116,7 +126,7 @@ Gemini API 키를 시스템 환경 변수에 등록합니다.
 ### Step 3. 로컬 서버 실행
 프로젝트 루트에서 아래 명령을 실행합니다.
 ```bash
-python dev_server.py
+python 02_source/dev_server.py
 ```
 서버가 시작되면 웹 브라우저를 열고 `http://localhost:8000`에 접속하여 서비스를 테스트할 수 있습니다.
 

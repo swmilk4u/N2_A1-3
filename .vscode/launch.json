@@ -5,7 +5,7 @@
       "name": "Career 서버 실행",
       "type": "debugpy",
       "request": "launch",
-      "program": "${workspaceFolder}/dev_server.py",
+      "program": "${workspaceFolder}/02_source/dev_server.py",
       "console": "integratedTerminal",
       "justMyCode": true
     }

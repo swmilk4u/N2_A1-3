@@ -145,9 +145,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. Set UI loading states
     setUIState('loading');
     
-    // 3. Perform asynchronous API fetch with Timeout (25 seconds)
+    // 3. Perform asynchronous API fetch with Timeout (60 seconds)
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 25000);
+    const timeoutId = setTimeout(() => controller.abort(), 60000);
 
     try {
       const response = await fetch('/api/coach', {
