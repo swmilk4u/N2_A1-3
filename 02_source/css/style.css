@@ -1206,3 +1206,70 @@ body {
   font-weight: 700;
 }
 
+/* ==========================================================================
+   Dark/Light Hybrid Theme Configuration
+   ========================================================================== */
+
+body.dark-mode {
+  --bg-color: #0b0713;
+  --bg-gradient: linear-gradient(135deg, #0b0713 0%, #150f24 100%);
+  --text-color: #f5f0fb;
+  --text-muted: #a69bb0;
+  
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: rgba(0, 0, 0, 0.45);
+  
+  --input-bg: rgba(255, 255, 255, 0.02);
+  --input-border: rgba(255, 255, 255, 0.1);
+  --input-focus-border: rgba(255, 84, 0, 0.5);
+  
+  --card-bg: rgba(255, 255, 255, 0.03);
+  --card-border: rgba(255, 255, 255, 0.08);
+  
+  --preset-bg: rgba(255, 255, 255, 0.05);
+  --preset-border: rgba(255, 255, 255, 0.08);
+}
+
+.theme-toggle-btn:hover {
+  background: rgba(0, 0, 0, 0.06) !important;
+}
+
+body.dark-mode .theme-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+body.dark-mode .blob {
+  opacity: 0.22;
+}
+
+body.dark-mode .news-item {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+body.dark-mode .news-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 84, 0, 0.25);
+}
+
+body.dark-mode .github-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-color);
+}
+
+body.dark-mode .github-btn:hover {
+  background: var(--primary-color);
+  color: #fff;
+  border-color: var(--primary-color);
+}
+
+/* Ensure transition smooth colors when toggling dark mode */
+body {
+  transition: background-color 0.4s ease, color 0.4s ease, background-image 0.4s ease;
+}
+.glass-card, .form-input, .form-textarea, .github-btn, .theme-toggle-btn {
+  transition: all 0.3s ease;
+}
+

@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const errorMessage = document.getElementById('error-message');
   const copyBtn = document.getElementById('copy-btn');
   const randomBtn = document.getElementById('random-btn');
+  const themeToggle = document.getElementById('theme-toggle');
   
   const faqItems = document.querySelectorAll('.faq-item');
   const toast = document.getElementById('toast');
@@ -29,6 +30,32 @@ document.addEventListener('DOMContentLoaded', () => {
   const currentTimeEl = document.getElementById('current-time');
 
   let rawAIResultText = ''; // Stores unparsed markdown for copy functionality
+
+  // ==========================================================================
+  // Dark/Light Hybrid Theme Controller
+  // ==========================================================================
+  if (themeToggle) {
+    const themeIcon = themeToggle.querySelector('i');
+    
+    // Restore user theme from localStorage
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      document.body.classList.add('dark-mode');
+      if (themeIcon) {
+        themeIcon.className = 'fa-solid fa-sun';
+      }
+    }
+
+    themeToggle.addEventListener('click', () => {
+      const isDark = document.body.classList.toggle('dark-mode');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      
+      if (themeIcon) {
+        themeIcon.className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+      }
+      showToast(isDark ? '🌙 다크 모드가 활성화되었습니다.' : '☀️ 라이트 모드가 활성화되었습니다.', 'success');
+    });
+  }
 
   // ==========================================================================
   // Real-time Clock Controller for Trend Header
