@@ -70,22 +70,22 @@
         </div>
       </div>
       <div class="hero-visual">
-        <div class="glass-card visual-card">
-          <div class="visual-header">
-            <span class="dot red"></span>
-            <span class="dot yellow"></span>
-            <span class="dot green"></span>
-          </div>
-          <div class="visual-body">
-            <div class="visual-line active" style="width: 85%;"></div>
-            <div class="visual-line" style="width: 65%;"></div>
-            <div class="visual-line" style="width: 95%;"></div>
-            <div class="visual-line" style="width: 50%;"></div>
-            <div class="visual-code-effect">
-              <i class="fa-solid fa-circle-nodes"></i>
-              <span>Structuring Impact Case Studies...</span>
+        <div class="glass-card trend-card" style="width: 100%; max-width: 440px; min-height: 280px; padding: 24px; display: flex; flex-direction: column; gap: var(--spacing-sm);">
+          <div class="trend-card-header" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255, 84, 0, 0.15); padding-bottom: 12px; margin-bottom: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px; color: var(--primary-color); font-weight: 700; font-size: 0.95rem; font-family: var(--font-header);">
+              <i class="fa-solid fa-fire-flame-curved" style="animation: pulse-glow 1.5s infinite alternate;"></i>
+              <span>실시간 커리어 & 창업 트렌드</span>
             </div>
+            <span class="badge" style="margin-bottom: 0; padding: 2px 8px; font-size: 0.7rem; background: rgba(255, 84, 0, 0.1); border-color: rgba(255, 84, 0, 0.2);">LIVE</span>
           </div>
+          <div id="news-loading" class="news-loading-skeleton" style="display: flex; flex-direction: column; gap: 14px;">
+            <div class="skeleton-line-long" style="height: 14px; background: rgba(0,0,0,0.04); border-radius: 4px; position: relative; overflow: hidden;"></div>
+            <div class="skeleton-line-medium" style="height: 14px; background: rgba(0,0,0,0.04); border-radius: 4px; position: relative; overflow: hidden;"></div>
+            <div class="skeleton-line-short" style="height: 14px; background: rgba(0,0,0,0.04); border-radius: 4px; position: relative; overflow: hidden;"></div>
+          </div>
+          <ul id="news-list" class="news-list d-none" style="list-style: none; display: flex; flex-direction: column; gap: 10px; max-height: 220px; overflow-y: auto; padding-right: 4px;">
+            <!-- RSS 뉴스 정보 바인딩 컨테이너 -->
+          </ul>
         </div>
       </div>
     </div>
@@ -102,7 +102,13 @@
       <div class="coaching-grid">
         <!-- Input Form (Glass Card) -->
         <div class="glass-card input-card">
-          <h3 class="card-title"><i class="fa-solid fa-pen-fancy card-title-icon"></i> 강점 프로필 입력</h3>
+          <div class="card-title-container" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md); flex-wrap: wrap; gap: var(--spacing-sm);">
+            <h3 class="card-title" style="margin-bottom: 0;"><i class="fa-solid fa-pen-fancy card-title-icon"></i> 강점 프로필 입력</h3>
+            <button type="button" id="random-btn" class="random-btn" title="예시 랜덤 채우기" style="background: rgba(255, 84, 0, 0.1); border: 1px solid rgba(255, 84, 0, 0.2); color: var(--primary-color); padding: 6px 12px; border-radius: var(--border-radius-sm); font-size: 0.85rem; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s ease; font-family: inherit;">
+              <i class="fa-solid fa-dice" style="font-size: 1rem;"></i>
+              <span>🎲 예시 랜덤입력</span>
+            </button>
+          </div>
           <form id="coaching-form" class="coaching-form">
             <div class="form-group">
               <label for="job-input" class="form-label">희망 직무</label>

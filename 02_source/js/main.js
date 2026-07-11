@@ -17,12 +17,169 @@ document.addEventListener('DOMContentLoaded', () => {
   const errorBanner = document.getElementById('error-banner');
   const errorMessage = document.getElementById('error-message');
   const copyBtn = document.getElementById('copy-btn');
+  const randomBtn = document.getElementById('random-btn');
   
   const faqItems = document.querySelectorAll('.faq-item');
   const toast = document.getElementById('toast');
   const toastMessage = document.getElementById('toast-message');
+  
+  const newsLoading = document.getElementById('news-loading');
+  const newsList = document.getElementById('news-list');
 
   let rawAIResultText = ''; // Stores unparsed markdown for copy functionality
+
+  // ==========================================================================
+  // Real-time Tech & Career News RSS Loader
+  // ==========================================================================
+  function formatPubDate(rawDate) {
+    if (!rawDate) return '';
+    try {
+      const d = new Date(rawDate);
+      if (isNaN(d.getTime())) return rawDate;
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${month}.${day}`;
+    } catch {
+      return rawDate;
+    }
+  }
+
+  async function fetchTrendNews() {
+    if (!newsLoading || !newsList) return;
+    
+    try {
+      const response = await fetch('/api/news');
+      if (!response.ok) throw new Error('API response failed');
+      
+      const data = await response.json();
+      if (data.success && data.news && data.news.length > 0) {
+        newsList.innerHTML = '';
+        data.news.forEach((item, index) => {
+          const li = document.createElement('li');
+          li.className = 'news-item';
+          li.style.animationDelay = `${index * 0.08}s`; // Stagger animation
+          
+          li.innerHTML = `
+            <a href="${item.link}" target="_blank" class="news-link" title="${item.title}">
+              ${item.title}
+            </a>
+            <div class="news-meta">
+              <span class="news-source"><i class="fa-solid fa-hashtag"></i> ${item.source}</span>
+              <span class="news-date">${formatPubDate(item.pubDate)}</span>
+            </div>
+          `;
+          newsList.appendChild(li);
+        });
+        
+        newsLoading.classList.add('d-none');
+        newsList.classList.remove('d-none');
+      } else {
+        throw new Error('No news data');
+      }
+    } catch (err) {
+      console.warn('Failed to load live RSS feed, utilizing fallback. error:', err);
+      // Fallback UI static rendering directly from fallback list if network fails
+      renderFallbackNews();
+    }
+  }
+
+  function renderFallbackNews() {
+    const fallbackData = [
+      { title: "2026 하반기 채용 트렌드: AI 기술 면접 대비와 돋보이는 포트폴리오 기획법", link: "https://www.wanted.co.kr", pubDate: "Sun, 12 Jul 2026", source: "원티드" },
+      { title: "성공적인 연봉 협상과 커리어 퀀텀 점프를 위한 이직 시나리오 가이드", link: "https://www.rememberapp.co.kr", pubDate: "Sat, 11 Jul 2026", source: "리멤버" },
+      { title: "1인 테크 창업 및 사이드 프로젝트로 완성하는 나만의 포트폴리오 노하우", link: "https://www.wanted.co.kr", pubDate: "Fri, 10 Jul 2026", source: "스타트업레시피" }
+    ];
+    
+    newsList.innerHTML = '';
+    fallbackData.forEach((item, index) => {
+      const li = document.createElement('li');
+      li.className = 'news-item';
+      li.style.animationDelay = `${index * 0.08}s`;
+      li.innerHTML = `
+        <a href="${item.link}" target="_blank" class="news-link" title="${item.title}">
+          ${item.title}
+        </a>
+        <div class="news-meta">
+          <span class="news-source"><i class="fa-solid fa-hashtag"></i> ${item.source}</span>
+          <span class="news-date">${formatPubDate(item.pubDate)}</span>
+        </div>
+      `;
+      newsList.appendChild(li);
+    });
+    newsLoading.classList.add('d-none');
+    newsList.classList.remove('d-none');
+  }
+
+  // Initial trigger for live RSS Feed fetching
+  fetchTrendNews();
+
+  // ==========================================================================
+  // Sample Data for Random Generator
+  // ==========================================================================
+  const sampleData = [
+    {
+      job: "프론트엔드 개발자",
+      skills: "React, TypeScript, TailwindCSS",
+      experience: "3개월간 쇼핑몰 프로젝트 진행. 결제 모듈 연동 시 CORS 네트워크 장애를 분석하여 프록시 서버 우회 설정으로 해결함. 페이지 로딩 속도를 1.5초 단축하여 사용자 전환율 개선에 기여."
+    },
+    {
+      job: "백엔드 파이썬 개발자",
+      skills: "Python, Django, PostgreSQL, Docker",
+      experience: "6개월간 물류 관리 플랫폼 배송 조회 API 구축. 데이터베이스 쿼리를 리팩토링하고 주요 외래키 인덱싱 처리를 추가하여 쿼리 실행 속도를 기존 대비 40% 향상시켰으며 서버 부하를 안정화함."
+    },
+    {
+      job: "데이터 엔지니어",
+      skills: "Python, SQL, Apache Spark, Airflow",
+      experience: "4개월 동안 대용량 실시간 에러 로그 수집 파이프라인 자동화 구현. 매일 50GB 가량의 정형/비정형 데이터를 클렌징하고 저장하는 스케줄링을 구축하여 기존 일 수작업 보고 단계를 자동 통계 리포트로 개선."
+    },
+    {
+      job: "UI/UX 디자이너",
+      skills: "Figma, CSS3, HTML5",
+      experience: "2개월간 교육 매칭 서비스 메인 앱 화면 예약 흐름 개선. 사용자 인터뷰 리서치 기반으로 결제 단계를 기존 5단계에서 2단계로 간소화 설계하여 최종 회원가입 이후 결제 전환 성공률을 15% 이상 증대함."
+    }
+  ];
+
+  let currentSampleIndex = -1;
+
+  // Auto-fill random template with updateable input values
+  function fillRandomExample(silent = false) {
+    let randomIndex;
+    do {
+      randomIndex = Math.floor(Math.random() * sampleData.length);
+    } while (randomIndex === currentSampleIndex && sampleData.length > 1);
+    
+    currentSampleIndex = randomIndex;
+    const selected = sampleData[randomIndex];
+    
+    jobInput.value = selected.job;
+    skillsInput.value = selected.skills;
+    experienceInput.value = selected.experience;
+    
+    // Synchronize preset badge chip active states
+    const activeSkills = selected.skills.split(',').map(s => s.trim().toLowerCase());
+    skillChips.forEach(chip => {
+      const skillName = chip.getAttribute('data-skill').toLowerCase();
+      if (activeSkills.includes(skillName)) {
+        chip.classList.add('selected');
+      } else {
+        chip.classList.remove('selected');
+      }
+    });
+
+    if (!silent) {
+      showToast('🎲 새로운 예시 데이터가 생성되었습니다!', 'success');
+    }
+  }
+
+  // Load initial random example on DOM load silently
+  fillRandomExample(true);
+
+  // Bind click event to the dice button
+  if (randomBtn) {
+    randomBtn.addEventListener('click', () => {
+      fillRandomExample(false);
+    });
+  }
 
   // ==========================================================================
   // Skills Presets (Badge Chips) Controller

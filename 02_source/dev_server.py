@@ -20,21 +20,35 @@ class DevServerHandler(http.server.SimpleHTTPRequestHandler):
     def do_POST(self):
         if self.path == '/api/coach':
             # Dynamically import and delegate handling to api/coach.py's handler class method
-            current_dir = os.path.dirname(os.path.abspath(__file__))
-            if current_dir not in sys.path:
-                sys.path.append(current_dir)
+            parent_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
+            if parent_dir not in sys.path:
+                sys.path.append(parent_dir)
             from api.coach import handler as CoachHandler
             CoachHandler.do_POST(self)
         else:
             super().do_POST()
             
+    def do_GET(self):
+        if self.path == '/api/news':
+            parent_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
+            if parent_dir not in sys.path:
+                sys.path.append(parent_dir)
+            from api.news import handler as NewsHandler
+            NewsHandler.do_GET(self)
+        else:
+            super().do_GET()
+
     def do_OPTIONS(self):
-        if self.path == '/api/coach':
-            current_dir = os.path.dirname(os.path.abspath(__file__))
-            if current_dir not in sys.path:
-                sys.path.append(current_dir)
-            from api.coach import handler as CoachHandler
-            CoachHandler.do_OPTIONS(self)
+        if self.path in ('/api/coach', '/api/news'):
+            parent_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
+            if parent_dir not in sys.path:
+                sys.path.append(parent_dir)
+            if self.path == '/api/coach':
+                from api.coach import handler as CoachHandler
+                CoachHandler.do_OPTIONS(self)
+            else:
+                from api.news import handler as NewsHandler
+                NewsHandler.do_OPTIONS(self)
         else:
             super().do_OPTIONS()
 
