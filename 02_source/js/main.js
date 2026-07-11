@@ -71,6 +71,9 @@ document.addEventListener('DOMContentLoaded', () => {
       
       const data = await response.json();
       if (data.success && data.news && data.news.length > 0) {
+        // 날짜 내림차순 (최신순) 정렬 보정
+        data.news.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+
         newsList.innerHTML = '';
         data.news.forEach((item, index) => {
           const li = document.createElement('li');
