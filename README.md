@@ -158,9 +158,13 @@ python 02_source/dev_server.py
    git push origin main
    ```
 2. [Vercel Dashboard](https://vercel.com/dashboard)에 로그인한 뒤 **Add New > Project**를 선택하고, 본인의 GitHub 저장소(`N2_A1-3`)를 연동합니다.
-3. 빌드 설정은 기본값으로 유지하되, **Environment Variables** 항목에 다음과 같이 변수를 추가해 줍니다.
-   * **Key**: `GEMINI_API_KEY`
-   * **Value**: *본인의 실제 Gemini API Key 값*
+3. 빌드 설정은 기본값으로 유지하되, **Environment Variables** 항목에 다음과 같이 변수들을 추가해 줍니다.
+   * **Key**: `GEMINI_API_KEY` (필수) / **Value**: *본인의 실제 Gemini API Key 값*
+   * **Key**: `SMTP_USER` (선택, 직접 이메일 전송용) / **Value**: *발신용 네이버 또는 구글 아이디 (예: `testuser`)*
+   * **Key**: `SMTP_PASSWORD` (선택, 직접 이메일 전송용) / **Value**: *네이버/구글 계정 설정에서 발급받은 '2차 인증 앱 비밀번호'*
+   * **Key**: `SMTP_SERVER` (선택, 기본값 `smtp.naver.com`) / **Value**: *발신 메일 SMTP 서버 도메인*
+   * **Key**: `SMTP_PORT` (선택, 기본값 `465` SSL) / **Value**: *SMTP 포트 번호*
+   * **Key**: `AUTO_WEBHOOK_URL` (선택, 외부 Webhook 알림용) / **Value**: *Discord, Slack 또는 Make.com Custom Webhook 주소*
 4. **Deploy** 버튼을 클릭하면 수초 내에 배포가 완료되며 고유한 Vercel URL이 생성됩니다!
 
 ---
@@ -191,11 +195,12 @@ python 02_source/dev_server.py
 ### 💡 보너스 과제 배움 포인트 & 서비스 확장 통찰
 
 #### 1. “사용자 입력 → 처리 → 저장/알림” 운영 흐름의 외부 연동 (운영 자동화 연동 완료)
-* **연동 현황**: 과제 보너스 1순위 조건인 **'운영 자동화 및 알림 연동'**을 백엔드에 전면 구현 완료했습니다.
-* **실시간 Webhook 동작 메커니즘**:
-  - [api/coach.py](file:///g:/%EB%82%B4%20%EB%93%9C%EB%9D%BC%EC%9D%B4%EB%B8%8C/20260415%20%EC%BD%94%EB%94%94%EC%84%B8%EC%9D%B4%20AI%20%EB%84%A4%EC%9D%B4%ED%8B%B0%EB%B8%8C%20%EA%B3%BC%EC%A0%95/02_mission/N2_A1-3_AI%20website/api/coach.py) 백엔드 서블릿에 `trigger_automation_webhook` 통신 함수를 자체 구현했습니다.
-  - 사용자가 AI 코칭 피드백 제출에 성공하면, 백엔드 서버에서 환경 변수 **`AUTO_WEBHOOK_URL`**에 등록된 외부 자동화 도구(예: Make.com, Zapier의 Custom Webhook 또는 Discord/Slack 웹훅) 주소로 사용자의 입력값(직무, 스택, 경험 명세 및 결과 전송 이메일)과 생성된 AI 분석 결과 요약 JSON 데이터를 실시간 전송합니다.
-  - 이를 통해 사용자가 입력한 이메일 정보를 기반으로 외부 노션 데이터베이스(Notion Database)에 로그를 누적 적재하거나 이메일로 분석 결과 보고서를 자동 수신하는 '사용자 입력 -> 처리 -> 간단한 저장소(노션)/알림(디스코드) 통합 운영 파이프라인'을 완벽하게 충족 및 가동시켰습니다. (환경 변수 미구성 시에는 오류 없이 통과 처리)
+* **연동 현황**: 과제 보너스 1순위 조건인 **'운영 자동화 및 알림 연동'**을 외부 플랫폼 의존 없이 백엔드 자체 SMTP와 Webhook 통신으로 전면 구현 완료했습니다.
+* **이메일 직접 발송 (SMTP) 및 Webhook 동작 메커니즘**:
+  - [api/coach.py](file:///g:/%EB%82%B4%20%EB%93%9C%EB%9D%BC%EC%9D%B4%EB%B8%8C/20260415%20%EC%BD%94%EB%94%94%EC%84%B8%EC%9D%B4%20AI%20%EB%84%A4%EC%9D%B4%ED%8B%B0%EB%B8%8C%20%EA%B3%BC%EC%A0%95/02_mission/N2_A1-3_AI%20website/api/coach.py) 백엔드 서블릿에 `send_email_direct` 이메일 발송 함수를 파이썬 내장 `smtplib` 라이브러리로 직접 개발했습니다.
+  - 사용자가 AI 코칭 피드백 제출에 성공하고 이메일을 기입했다면, 백엔드 서버에서 환경 변수 **`SMTP_USER`** 및 **`SMTP_PASSWORD`**를 기반으로 네이버/구글 SMTP 서버에 보안 접속하여 **분석 리포트 원문을 입력받은 사용자 이메일로 다이렉트 자동 발송**합니다.
+  - 또한, 동시에 **`AUTO_WEBHOOK_URL`** 변수를 통해 Discord 알림이나 노션 데이터베이스에 JSON 데이터를 실시간 동시 전송할 수 있는 이중 파이프라인을 구축했습니다.
+  - 환경 변수 미세팅 시에는 에러 없이 부드럽게 무시하고 본 서비스가 구동되도록 설계하여 결합도를 낮췄습니다.
 
 #### 2. 사용성 개선과 “개선 효과를 확인하는 방법” 설계 (UX 및 측정 고도화 통찰)
 * **통찰**: 기능만 작동하는 엔지니어링 중심의 제품에서 벗어나, 사용자가 서비스에 진입하고 탐색할 때 겪는 심리적 마찰(Friction)을 억제하기 위해 마이크로 인터랙션을 설계했습니다.

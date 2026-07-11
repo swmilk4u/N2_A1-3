@@ -4,6 +4,58 @@ import os
 from google import genai
 from google.genai import types
 import urllib.request
+import smtplib
+from email.mime.text import MIMEText
+from email.header import Header
+
+def send_email_direct(to_email, job, skills, experience, ai_result):
+    smtp_user = os.environ.get("SMTP_USER", "")
+    smtp_pass = os.environ.get("SMTP_PASSWORD", "")
+    smtp_server = os.environ.get("SMTP_SERVER", "smtp.naver.com")
+    try:
+        smtp_port = int(os.environ.get("SMTP_PORT", "465"))
+    except:
+        smtp_port = 465
+        
+    # 미구성 시 예외 없이 종료
+    if not smtp_user or not smtp_pass or not to_email:
+        return
+        
+    subject = "[Career Carrier] AI 커리어 브랜딩 코칭 분석 리포트"
+    body = (
+        f"안녕하세요! Career? Carrier! 커리어 분석 코치입니다.\n\n"
+        f"요청하신 AI 커리어 코칭 피드백 결과 리포트를 직접 전송해 드립니다.\n\n"
+        f"■ 신청 정보\n"
+        f"- 희망 직무: {job}\n"
+        f"- 보유 기술: {skills}\n"
+        f"- 핵심 경험: {experience}\n\n"
+        f"-------------------------------------------------------------\n"
+        f"■ AI 분석 리포트 본문\n"
+        f"-------------------------------------------------------------\n"
+        f"{ai_result}\n\n"
+        f"-------------------------------------------------------------\n"
+        f"본 메일은 Career? Carrier! Vercel 서버리스 엔진을 통해 자동으로 직접 발신되었습니다.\n"
+    )
+    
+    try:
+        msg = MIMEText(body, 'plain', 'utf-8')
+        msg['Subject'] = Header(subject, 'utf-8')
+        from_domain = "naver.com" if "naver" in smtp_server else "gmail.com"
+        msg['From'] = f"Career Carrier <{smtp_user}@{from_domain}>"
+        msg['To'] = to_email
+        
+        if smtp_port == 465:
+            with smtplib.SMTP_SSL(smtp_server, smtp_port, timeout=10) as server:
+                server.login(smtp_user, smtp_pass)
+                server.sendmail(f"{smtp_user}@{from_domain}", [to_email], msg.as_string())
+        else:
+            with smtplib.SMTP(smtp_server, smtp_port, timeout=10) as server:
+                server.starttls()
+                server.login(smtp_user, smtp_pass)
+                server.sendmail(f"{smtp_user}@{from_domain}", [to_email], msg.as_string())
+        print(f"[SMTP Success] Email sent directly to {to_email}")
+    except Exception as e:
+        print(f"[SMTP Error] Failed to send email via SMTP: {str(e)}")
 
 def trigger_automation_webhook(email, job, skills, experience, ai_result):
     # 환경 변수 "AUTO_WEBHOOK_URL"에 설정된 Discord Webhook 또는 Make.com Webhook 주소를 읽어옵니다.
@@ -128,6 +180,9 @@ class handler(BaseHTTPRequestHandler):
             
             # 4.5. 외부 노코드/알림 Webhook 트리거 실행
             trigger_automation_webhook(email, job, skills, experience, response.text)
+            
+            # 4.6. 외부 도구 없이 백엔드 자체 SMTP 직접 이메일 발송 실행
+            send_email_direct(email, job, skills, experience, response.text)
             
             # 5. 정상 응답 반환
             self.send_response(200)
