@@ -208,3 +208,18 @@ python 02_source/dev_server.py
 * Vercel 배포 도중 Python 런타임 버전 누락 에러 및 `ModuleNotFoundError`로 인한 API 통신 에러가 연이어 발생했습니다.
 * 문제를 진단하기 위해 Vercel의 실시간 **Deploy Logs**를 직접 추적했고, 파이썬 서버리스 함수의 런타임 지정 규약이 `@latest`로 정의되어 발생한 에러임을 인지하고 `3.12`로 사양을 최적화했으며, 루트 디렉토리에 의존성 설치용 `requirements.txt`가 누락되어 구글 AI 라이브러리 로드가 실패했음을 최종 규명하여 최상위 경로에 배치함으로써 실시간 배포 오류를 완벽하게 셀프 디버깅하여 해결하였습니다.
 * 또한 실시간 뉴스 연동 시 구글 뉴스 RSS가 오래된 기사를 우선 노출하던 로직의 한계를 발견하여, 검색 쿼리를 OR 조건 결합으로 변경하고 시간 연산자 `when:14d`를 강제 주입하여 진짜 최근 발행된 2026년 실시간 트렌드 뉴스만을 렌더링하도록 쿼리를 정밀 최적화하여 해결했습니다.
+
+---
+
+## 9. 서비스 동작 증빙 스크린샷 (Screenshots)
+
+과제 평가 기준에 부합하도록 Vercel 실시간 배포 환경에서 AI 에이전트가 직접 접속하여 캡처한 동작 증빙 스크린샷 1세트입니다.
+
+### 🖥️ 데스크톱 뷰 (Desktop View)
+![데스크톱 뷰](01_document/screenshots/desktop_view.png)
+
+### 📱 모바일 뷰 (Mobile View)
+![모바일 뷰](01_document/screenshots/mobile_view.png)
+
+### ⚙️ AI 기능 분석 동작 화면 (AI Function View)
+![AI 기능 분석 화면](01_document/screenshots/ai_function_view.png)
