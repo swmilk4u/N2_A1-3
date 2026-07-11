@@ -87,7 +87,8 @@
 │   ├── coach.py             # 파이썬 AI 코칭 분석 서비스 핸들러 (Gemini 3.5 Flash 적용)
 │   └── news.py              # 실시간 커리어 및 창업 트렌드 뉴스 수집용 RSS 파서 핸들러 (신규)
 ├── 01_document/
-│   └── N2_A1-3 과제미션.txt  # 과제 요구사항 명세서
+│   ├── N2_A1-3 과제미션.txt  # 과제 요구사항 명세서
+│   └── ai_chat_history.md   # AI 코딩 도구 협업 과정 증빙 로그 파일 (신규)
 ├── 02_source/               # 홈페이지 동작 관련 정적 및 실행 리소스 폴더
 │   ├── requirements.txt     # 백엔드 Python 의존성 패키지 (google-genai)
 │   ├── dev_server.py        # 로컬 통합 테스트용 멀티스레드(Threading) 개발 서버
