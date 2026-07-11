@@ -1,7 +1,7 @@
-# 🌌 AI Career Oasis (퍼스널 커리어 & 포트폴리오 코치)
+# 🌌 Career? Carrier! (퍼스널 커리어 & 포트폴리오 코치)
 
 > **"당신의 커리어에 우아한 빛을 더하다."**  
-> AI Career Oasis는 구직자 및 이직 희망자의 핵심 경험과 기술 스택을 분석하여, 서류 전형을 압도할 수 있는 매력적인 자기소개서 초안과 단계별 포트폴리오 스토리라인 전략을 실시간으로 제안해 주는 프리미엄 AI 웹 서비스입니다.
+> Career? Carrier!는 구직자 및 이직 희망자의 핵심 경험과 기술 스택을 분석하여, 서류 전형을 압도할 수 있는 매력적인 자기소개서 초안과 단계별 포트폴리오 스토리라인 전략을 실시간으로 제안해 주는 프리미엄 AI 웹 서비스입니다.
 > 
 > * **배포 URL:** [https://swmilk4u-1.vercel.app](https://swmilk4u-1.vercel.app)
 > * **GitHub 저장소:** [https://github.com/swmilk4u/N2_A1-3](https://github.com/swmilk4u/N2_A1-3)
@@ -24,7 +24,7 @@
 
 ### 🎯 서비스 목적 및 가치
 많은 구직자가 자신의 훌륭한 프로젝트 경험과 기술을 가지고 있음에도 불구하고, 자기소개서의 첫 문장을 설계하거나 포트폴리오의 구조를 잡는 데 심각한 어려움(공백 공포증)을 겪습니다. 
-**AI Career Oasis**는 사용자의 단편적인 경험 키워드들을 전문 컨설턴트 수준의 스토리텔링과 로드맵으로 변환하여 구직 준비 시간을 단축하고 자신감을 불어넣어 줍니다.
+**Career? Carrier!**는 사용자의 단편적인 경험 키워드들을 전문 컨설턴트 수준의 스토리텔링과 로드맵으로 변환하여 구직 준비 시간을 단축하고 자신감을 불어넣어 줍니다.
 
 ### 👥 타겟 사용자
 * **신입 개발자 / 디자이너**: 첫 포트폴리오를 제작하려 하나 구성 전략이 막막한 취업 준비생.
@@ -141,7 +141,7 @@ python 02_source/dev_server.py
 1. 본 프로젝트의 수정 내역을 본인 GitHub 저장소에 커밋 및 푸시합니다.
    ```bash
    git add .
-   git commit -m "feat: AI Career Oasis 개발 완료 및 히스토리 정리"
+   git commit -m "feat: Career? Carrier! 개발 완료 및 히스토리 정리"
    git push origin main
    ```
 2. [Vercel Dashboard](https://vercel.com/dashboard)에 로그인한 뒤 **Add New > Project**를 선택하고, 본인의 GitHub 저장소(`N2_A1-3`)를 연동합니다.
