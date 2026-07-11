@@ -3,6 +3,36 @@ import json
 import os
 from google import genai
 from google.genai import types
+import urllib.request
+
+def trigger_automation_webhook(job, skills, experience, ai_result):
+    # 환경 변수 "AUTO_WEBHOOK_URL"에 설정된 Discord Webhook 또는 Make.com Webhook 주소를 읽어옵니다.
+    # 미구성 시 에러 없이 통과 처리하여 의존성을 제거합니다.
+    webhook_url = os.environ.get("AUTO_WEBHOOK_URL", "")
+    if not webhook_url:
+        return
+        
+    ai_summary = ai_result[:300] + "..." if len(ai_result) > 300 else ai_result
+    
+    payload = {
+        "event": "AI_Career_Coaching_Success",
+        "job": job,
+        "skills": skills,
+        "experience": experience,
+        "ai_result_summary": ai_summary
+    }
+    
+    try:
+        req = urllib.request.Request(
+            webhook_url,
+            data=json.dumps(payload).encode('utf-8'),
+            headers={'Content-Type': 'application/json'}
+        )
+        # 서비스 성능 유지를 위해 2.5초 타임아웃 제한
+        with urllib.request.urlopen(req, timeout=2.5) as response:
+            pass
+    except Exception as e:
+        print(f"[Webhook Integration Ignored] {str(e)}")
 
 # 🌟 Load environment variables from .env if present (self-sufficient backend loading)
 env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../.env')
@@ -93,6 +123,9 @@ class handler(BaseHTTPRequestHandler):
                     temperature=0.7,
                 )
             )
+            
+            # 4.5. 외부 노코드/알림 Webhook 트리거 실행
+            trigger_automation_webhook(job, skills, experience, response.text)
             
             # 5. 정상 응답 반환
             self.send_response(200)
