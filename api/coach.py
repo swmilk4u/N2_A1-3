@@ -5,7 +5,7 @@ from google import genai
 from google.genai import types
 import urllib.request
 
-def trigger_automation_webhook(job, skills, experience, ai_result):
+def trigger_automation_webhook(email, job, skills, experience, ai_result):
     # 환경 변수 "AUTO_WEBHOOK_URL"에 설정된 Discord Webhook 또는 Make.com Webhook 주소를 읽어옵니다.
     # 미구성 시 에러 없이 통과 처리하여 의존성을 제거합니다.
     webhook_url = os.environ.get("AUTO_WEBHOOK_URL", "")
@@ -16,6 +16,7 @@ def trigger_automation_webhook(job, skills, experience, ai_result):
     
     payload = {
         "event": "AI_Career_Coaching_Success",
+        "email": email,
         "job": job,
         "skills": skills,
         "experience": experience,
@@ -73,6 +74,7 @@ class handler(BaseHTTPRequestHandler):
             job = data.get('job', '').strip()
             skills = data.get('skills', '').strip()
             experience = data.get('experience', '').strip()
+            email = data.get('email', '').strip()
             
             # 필수 데이터 검증
             if not job or not skills or not experience:
@@ -125,7 +127,7 @@ class handler(BaseHTTPRequestHandler):
             )
             
             # 4.5. 외부 노코드/알림 Webhook 트리거 실행
-            trigger_automation_webhook(job, skills, experience, response.text)
+            trigger_automation_webhook(email, job, skills, experience, response.text)
             
             # 5. 정상 응답 반환
             self.send_response(200)

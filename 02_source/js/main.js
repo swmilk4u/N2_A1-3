@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const skillsInput = document.getElementById('skills-input');
   const skillChips = document.querySelectorAll('.skill-chip');
   const experienceInput = document.getElementById('experience-input');
+  const emailInput = document.getElementById('email-input');
   const submitBtn = document.getElementById('submit-btn');
   const btnText = document.getElementById('btn-text');
   
@@ -175,6 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
     jobInput.value = selected.job;
     skillsInput.value = selected.skills;
     experienceInput.value = selected.experience;
+    if (emailInput) emailInput.value = '';
     
     // Synchronize preset badge chip active states
     const activeSkills = selected.skills.split(',').map(s => s.trim().toLowerCase());
@@ -314,6 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const job = jobInput.value.trim();
     const skills = skillsInput.value.trim();
     const experience = experienceInput.value.trim();
+    const email = emailInput ? emailInput.value.trim() : '';
 
     if (!job || !skills || !experience) {
       showErrorBanner('모든 필드를 정상적으로 채워주세요. 빈 입력은 분석할 수 없습니다.');
@@ -333,7 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ job, skills, experience }),
+        body: JSON.stringify({ job, skills, experience, email }),
         signal: controller.signal
       });
 
