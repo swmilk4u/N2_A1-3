@@ -25,8 +25,26 @@ document.addEventListener('DOMContentLoaded', () => {
   
   const newsLoading = document.getElementById('news-loading');
   const newsList = document.getElementById('news-list');
+  const currentTimeEl = document.getElementById('current-time');
 
   let rawAIResultText = ''; // Stores unparsed markdown for copy functionality
+
+  // ==========================================================================
+  // Real-time Clock Controller for Trend Header
+  // ==========================================================================
+  function updateClock() {
+    if (!currentTimeEl) return;
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const hh = String(now.getHours()).padStart(2, '0');
+    const min = String(now.getMinutes()).padStart(2, '0');
+    const ss = String(now.getSeconds()).padStart(2, '0');
+    currentTimeEl.innerText = `${yyyy}.${mm}.${dd} ${hh}:${min}:${ss}`;
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
 
   // ==========================================================================
   // Real-time Tech & Career News RSS Loader

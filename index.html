@@ -71,12 +71,15 @@
       </div>
       <div class="hero-visual">
         <div class="glass-card trend-card" style="width: 100%; max-width: 520px; min-height: 360px; padding: 28px; display: flex; flex-direction: column; gap: var(--spacing-md);">
-          <div class="trend-card-header" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255, 84, 0, 0.15); padding-bottom: 12px; margin-bottom: 8px;">
+          <div class="trend-card-header" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255, 84, 0, 0.15); padding-bottom: 12px; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
             <div style="display: flex; align-items: center; gap: 8px; color: var(--primary-color); font-weight: 700; font-size: 0.95rem; font-family: var(--font-header);">
               <i class="fa-solid fa-fire-flame-curved" style="animation: pulse-glow 1.5s infinite alternate;"></i>
               <span>실시간 커리어 & 창업 트렌드</span>
             </div>
-            <span class="badge" style="margin-bottom: 0; padding: 2px 8px; font-size: 0.7rem; background: rgba(255, 84, 0, 0.1); border-color: rgba(255, 84, 0, 0.2);">LIVE</span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span id="current-time" style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600; font-family: monospace;"></span>
+              <span class="badge" style="margin-bottom: 0; padding: 2px 8px; font-size: 0.7rem; background: rgba(255, 84, 0, 0.1); border-color: rgba(255, 84, 0, 0.2);">LIVE</span>
+            </div>
           </div>
           <div id="news-loading" class="news-loading-skeleton" style="display: flex; flex-direction: column; gap: 14px;">
             <div class="skeleton-line-long" style="height: 14px; background: rgba(0,0,0,0.04); border-radius: 4px; position: relative; overflow: hidden;"></div>
