@@ -40,19 +40,24 @@ def send_email_direct(to_email, job, skills, experience, ai_result):
     try:
         msg = MIMEText(body, 'plain', 'utf-8')
         msg['Subject'] = Header(subject, 'utf-8')
-        from_domain = "naver.com" if "naver" in smtp_server else "gmail.com"
-        msg['From'] = f"Career Carrier <{smtp_user}@{from_domain}>"
+        if "@" in smtp_user:
+            sender_email = smtp_user
+        else:
+            from_domain = "naver.com" if "naver" in smtp_server else "gmail.com"
+            sender_email = f"{smtp_user}@{from_domain}"
+            
+        msg['From'] = f"Career Carrier <{sender_email}>"
         msg['To'] = to_email
         
         if smtp_port == 465:
             with smtplib.SMTP_SSL(smtp_server, smtp_port, timeout=10) as server:
                 server.login(smtp_user, smtp_pass)
-                server.sendmail(f"{smtp_user}@{from_domain}", [to_email], msg.as_string())
+                server.sendmail(sender_email, [to_email], msg.as_string())
         else:
             with smtplib.SMTP(smtp_server, smtp_port, timeout=10) as server:
                 server.starttls()
                 server.login(smtp_user, smtp_pass)
-                server.sendmail(f"{smtp_user}@{from_domain}", [to_email], msg.as_string())
+                server.sendmail(sender_email, [to_email], msg.as_string())
         print(f"[SMTP Success] Email sent directly to {to_email}")
     except Exception as e:
         print(f"[SMTP Error] Failed to send email via SMTP: {str(e)}")
@@ -86,6 +91,98 @@ def trigger_automation_webhook(email, job, skills, experience, ai_result):
             pass
     except Exception as e:
         print(f"[Webhook Integration Ignored] {str(e)}")
+
+def split_text_to_chunks(text, chunk_size=2000):
+    if not text:
+        return []
+    return [text[i:i+chunk_size] for i in range(0, len(text), chunk_size)]
+
+def send_to_notion_database(email, job, skills, experience, ai_result):
+    notion_token = os.environ.get("NOTION_TOKEN", "")
+    notion_db_id = os.environ.get("NOTION_DATABASE_ID", "")
+    
+    # Skip if credentials are not configured
+    if not notion_token or not notion_db_id:
+        return
+        
+    url = "https://api.notion.com/v1/pages"
+    headers = {
+        "Authorization": f"Bearer {notion_token}",
+        "Content-Type": "application/json",
+        "Notion-Version": "2022-06-28"
+    }
+    
+    children_blocks = []
+    # Notion rich text has a 2000-character limit; chunk to 1800 safely
+    for chunk in split_text_to_chunks(ai_result, 1800):
+        if chunk.strip():
+            children_blocks.append({
+                "object": "block",
+                "type": "paragraph",
+                "paragraph": {
+                    "rich_text": [
+                        {
+                            "type": "text",
+                            "text": {
+                                "content": chunk
+                            }
+                        }
+                    ]
+                }
+            })
+            
+    payload = {
+        "parent": { "database_id": notion_db_id },
+        "properties": {
+            "희망 직무": {
+                "title": [
+                    {
+                        "text": {
+                            "content": job
+                        }
+                    }
+                ]
+            },
+            "보유 기술": {
+                "rich_text": [
+                    {
+                        "text": {
+                            "content": skills
+                        }
+                    }
+                ]
+            },
+            "핵심 경험": {
+                "rich_text": [
+                    {
+                        "text": {
+                            "content": experience
+                        }
+                    }
+                ]
+            }
+        },
+        "children": children_blocks
+    }
+    
+    if email:
+        payload["properties"]["이메일"] = {
+            "email": email
+        }
+        
+    try:
+        req = urllib.request.Request(
+            url,
+            data=json.dumps(payload).encode('utf-8'),
+            headers=headers,
+            method='POST'
+        )
+        # Timeout at 3.0s to avoid blocking responses
+        with urllib.request.urlopen(req, timeout=3.0) as response:
+            pass
+        print("[Notion Success] AI coaching result integrated to Notion database successfully.")
+    except Exception as e:
+        print(f"[Notion Integration Error] {str(e)}")
 
 # 🌟 Load environment variables from .env if present (self-sufficient backend loading)
 env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../.env')
@@ -183,6 +280,9 @@ class handler(BaseHTTPRequestHandler):
             
             # 4.6. 외부 도구 없이 백엔드 자체 SMTP 직접 이메일 발송 실행
             send_email_direct(email, job, skills, experience, response.text)
+            
+            # 4.7. 노션 데이터베이스 결과 자동 적재 실행 (환경 변수 구성 시 작동)
+            send_to_notion_database(email, job, skills, experience, response.text)
             
             # 5. 정상 응답 반환
             self.send_response(200)
