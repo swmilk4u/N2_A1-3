@@ -135,13 +135,18 @@ def send_to_notion_database(email, job, skills, experience, ai_result):
     
     raw_db_id = (
         os.environ.get("NOTION_DATABASE_ID", "") or 
-        os.environ.get("NOTION_DB_ID", "")
+        os.environ.get("NOTION_DB_ID", "") or
+        "3a5ce80de197806ab961ce5eadeb72bd"
     ).strip()
     
     notion_db_id = extract_notion_db_id(raw_db_id)
     
     # Skip if credentials are not configured
-    if not notion_token or not notion_db_id:
+    if not notion_token:
+        print("[Notion Error] NOTION_API_KEY is missing in environment variables.")
+        return
+    if not notion_db_id:
+        print("[Notion Error] NOTION_DATABASE_ID is missing.")
         return
         
     url = "https://api.notion.com/v1/pages"
