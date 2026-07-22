@@ -327,7 +327,7 @@ class handler(BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps({"success": False, "detail": "서버에 GEMINI_API_KEY 환경 변수가 구성되지 않았습니다. Vercel 설정 혹은 로컬 env 설정을 확인하세요."}).encode('utf-8'))
                 return
             
-            # 4. google-genai Client 초기화 및 호출
+            # 4. google-genai Client 초기화 및 multi-model fallback 호출
             client = genai.Client(api_key=api_key)
             
             system_instruction = (
@@ -349,14 +349,30 @@ class handler(BaseHTTPRequestHandler):
                 "위 정보를 바탕으로 자기소개서 강점 기술 초안과 포트폴리오 가이드를 멋지게 작성해 주세요."
             )
             
-            response = client.models.generate_content(
-                model='gemini-2.5-flash',
-                contents=prompt,
-                config=types.GenerateContentConfig(
-                    system_instruction=system_instruction,
-                    temperature=0.7,
-                )
-            )
+            # 다중 모델 fallback (429 쿼터나 404 방지)
+            candidate_models = ['gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-flash-latest']
+            response = None
+            last_exception = None
+            
+            for target_model in candidate_models:
+                try:
+                    response = client.models.generate_content(
+                        model=target_model,
+                        contents=prompt,
+                        config=types.GenerateContentConfig(
+                            system_instruction=system_instruction,
+                            temperature=0.7,
+                        )
+                    )
+                    if response and response.text:
+                        print(f"[Gemini Success] Generated with model: {target_model}")
+                        break
+                except Exception as m_err:
+                    print(f"[Gemini Fallback Warning] Model {target_model} failed: {m_err}")
+                    last_exception = m_err
+                    
+            if not response or not response.text:
+                raise last_exception or Exception("Gemini API 모델 생성에 실패하였습니다.")
             
             # 4.5. 외부 노코드/알림 Webhook 트리거 실행
             trigger_automation_webhook(email, job, skills, experience, response.text)
