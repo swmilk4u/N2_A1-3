@@ -5,6 +5,8 @@
 > 
 > * **배포 URL:** [https://swmilk4u-1.vercel.app](https://swmilk4u-1.vercel.app)
 > * **GitHub 저장소:** [https://github.com/swmilk4u/N2_A1-3](https://github.com/swmilk4u/N2_A1-3)
+*
+> * **노션 저장소:** [https://app.notion.com/p/3a5ce80de197806ab961ce5eadeb72bd)
 
 ---
 

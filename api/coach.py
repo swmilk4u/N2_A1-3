@@ -97,9 +97,48 @@ def split_text_to_chunks(text, chunk_size=2000):
         return []
     return [text[i:i+chunk_size] for i in range(0, len(text), chunk_size)]
 
+import re
+import urllib.error
+from datetime import datetime, timezone, timedelta
+
+def extract_notion_db_id(raw_id):
+    if not raw_id:
+        return ""
+    raw_id = raw_id.strip()
+    # If full URL is passed, extract 32-character hex ID
+    match = re.search(r'([a-f0-9]{32})', raw_id.replace('-', ''), re.IGNORECASE)
+    if match:
+        return match.group(1)
+    return raw_id
+
+def get_notion_db_schema(notion_token, notion_db_id):
+    url = f"https://api.notion.com/v1/databases/{notion_db_id}"
+    headers = {
+        "Authorization": f"Bearer {notion_token}",
+        "Notion-Version": "2022-06-28"
+    }
+    try:
+        req = urllib.request.Request(url, headers=headers, method='GET')
+        with urllib.request.urlopen(req, timeout=3.0) as response:
+            data = json.loads(response.read().decode('utf-8'))
+            return data.get("properties", {})
+    except Exception as e:
+        print(f"[Notion Schema Inspection Warning] {e}")
+        return None
+
 def send_to_notion_database(email, job, skills, experience, ai_result):
-    notion_token = os.environ.get("NOTION_TOKEN", "")
-    notion_db_id = os.environ.get("NOTION_DATABASE_ID", "")
+    notion_token = (
+        os.environ.get("NOTION_TOKEN", "") or 
+        os.environ.get("NOTION_API_KEY", "") or 
+        os.environ.get("NOTION_KEY", "")
+    ).strip()
+    
+    raw_db_id = (
+        os.environ.get("NOTION_DATABASE_ID", "") or 
+        os.environ.get("NOTION_DB_ID", "")
+    ).strip()
+    
+    notion_db_id = extract_notion_db_id(raw_db_id)
     
     # Skip if credentials are not configured
     if not notion_token or not notion_db_id:
@@ -131,44 +170,77 @@ def send_to_notion_database(email, job, skills, experience, ai_result):
                 }
             })
             
+    # Current KST time string for Date property
+    kst_now = datetime.now(timezone(timedelta(hours=9))).isoformat()
+
+    # 🌟 1. Dynamically inspect DB schema for robust column mapping
+    db_schema = get_notion_db_schema(notion_token, notion_db_id)
+    
+    properties_payload = {}
+    
+    if db_schema:
+        # Find Title property
+        title_prop_name = None
+        for prop_name, prop_meta in db_schema.items():
+            if prop_meta.get("type") == "title":
+                title_prop_name = prop_name
+                break
+        if not title_prop_name:
+            title_prop_name = "Name"
+            
+        properties_payload[title_prop_name] = {
+            "title": [{"text": {"content": job}}]
+        }
+        
+        # Find Rich Text, Email, Date properties
+        rich_text_props = [name for name, meta in db_schema.items() if meta.get("type") == "rich_text"]
+        email_props = [name for name, meta in db_schema.items() if meta.get("type") == "email"]
+        date_props = [name for name, meta in db_schema.items() if meta.get("type") == "date"]
+        
+        # Map Rich Text properties
+        if "보유 기술" in rich_text_props:
+            properties_payload["보유 기술"] = {"rich_text": [{"text": {"content": skills}}]}
+        elif rich_text_props:
+            properties_payload[rich_text_props[0]] = {"rich_text": [{"text": {"content": skills}}]}
+            
+        if "핵심 경험" in rich_text_props:
+            properties_payload["핵심 경험"] = {"rich_text": [{"text": {"content": experience}}]}
+        elif len(rich_text_props) > 1:
+            properties_payload[rich_text_props[1]] = {"rich_text": [{"text": {"content": experience}}]}
+            
+        # Map Email property if present in DB
+        if email:
+            if "이메일" in email_props:
+                properties_payload["이메일"] = {"email": email}
+            elif email_props:
+                properties_payload[email_props[0]] = {"email": email}
+                
+        # Map Date property if present in DB
+        matched_date_prop = None
+        for candidate in ["등록 날짜", "등록 일시", "생성 일시", "생성 날짜", "생성일", "등록일", "날짜", "Date", "Created Date"]:
+            if candidate in date_props:
+                matched_date_prop = candidate
+                break
+        if not matched_date_prop and date_props:
+            matched_date_prop = date_props[0]
+            
+        if matched_date_prop:
+            properties_payload[matched_date_prop] = {"date": {"start": kst_now}}
+    else:
+        # Fallback to standard property names
+        properties_payload = {
+            "희망 직무": {"title": [{"text": {"content": job}}]},
+            "보유 기술": {"rich_text": [{"text": {"content": skills}}]},
+            "핵심 경험": {"rich_text": [{"text": {"content": experience}}]}
+        }
+        if email:
+            properties_payload["이메일"] = {"email": email}
+
     payload = {
         "parent": { "database_id": notion_db_id },
-        "properties": {
-            "희망 직무": {
-                "title": [
-                    {
-                        "text": {
-                            "content": job
-                        }
-                    }
-                ]
-            },
-            "보유 기술": {
-                "rich_text": [
-                    {
-                        "text": {
-                            "content": skills
-                        }
-                    }
-                ]
-            },
-            "핵심 경험": {
-                "rich_text": [
-                    {
-                        "text": {
-                            "content": experience
-                        }
-                    }
-                ]
-            }
-        },
+        "properties": properties_payload,
         "children": children_blocks
     }
-    
-    if email:
-        payload["properties"]["이메일"] = {
-            "email": email
-        }
         
     try:
         req = urllib.request.Request(
@@ -177,10 +249,16 @@ def send_to_notion_database(email, job, skills, experience, ai_result):
             headers=headers,
             method='POST'
         )
-        # Timeout at 3.0s to avoid blocking responses
-        with urllib.request.urlopen(req, timeout=3.0) as response:
+        # Timeout at 4.0s to avoid blocking responses
+        with urllib.request.urlopen(req, timeout=4.0) as response:
             pass
         print("[Notion Success] AI coaching result integrated to Notion database successfully.")
+    except urllib.error.HTTPError as http_err:
+        try:
+            err_body = http_err.read().decode('utf-8')
+            print(f"[Notion Integration HTTP Error {http_err.code}] {err_body}")
+        except Exception:
+            print(f"[Notion Integration HTTP Error {http_err.code}] {str(http_err)}")
     except Exception as e:
         print(f"[Notion Integration Error] {str(e)}")
 
@@ -267,7 +345,7 @@ class handler(BaseHTTPRequestHandler):
             )
             
             response = client.models.generate_content(
-                model='gemini-3.5-flash',
+                model='gemini-2.5-flash',
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     system_instruction=system_instruction,
