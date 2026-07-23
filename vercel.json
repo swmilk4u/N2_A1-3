@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "routes": [
+    {
+      "src": "/api/coach",
+      "dest": "/api/coach.py"
+    },
+    {
+      "src": "/api/news",
+      "dest": "/api/news.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}
