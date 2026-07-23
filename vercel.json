@@ -1,1 +1,16 @@
-{"version":2,"builds":[{"src":"api/coach.py","use":"@vercel/python"},{"src":"api/news.py","use":"@vercel/python"},{"src":"index.html","use":"@vercel/static"},{"src":"02_source/**/*","use":"@vercel/static"}],"routes":[{"src":"/api/coach","dest":"/api/coach.py"},{"src":"/api/news","dest":"/api/news.py"},{"src":"/02_source/(.*)","dest":"/02_source/$1"},{"src":"/(.*)","dest":"/index.html"}]}
+{
+    "version": 2,
+    "builds": [
+          { "src": "api/coach.py", "use": "@vercel/python" },
+          { "src": "api/news.py", "use": "@vercel/python" },
+          { "src": "index.html", "use": "@vercel/static" },
+          { "src": "02_source/**", "use": "@vercel/static" },
+          { "src": "01_document/**", "use": "@vercel/static" }
+    ],
+    "routes": [
+          { "src": "/02_source/(.*)", "dest": "/02_source/$1" },
+          { "src": "/01_document/(.*)", "dest": "/01_document/$1" },
+          { "src": "/api/(.*)", "dest": "/api/$1" },
+          { "src": "/(.*)", "dest": "/index.html" }
+    ]
+}
