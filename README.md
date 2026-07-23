@@ -117,37 +117,6 @@
 
 ## 4. 프로젝트 폴더 구조
 
-```text
-N2_A1-3_AI website/
-│
-├── index.html               ← 웹 페이지 본체 (프론트엔드)
-├── README.md                ← 프로젝트 보고서 및 문서
-├── requirements.txt         ← Python 패키지 목록 (Vercel 빌드 시 자동 설치됨)
-├── vercel.json              ← Vercel 배포 라우팅 설정
-├── .gitignore               ← API 키 등 민감 파일이 GitHub에 올라가지 않도록 제외
-│
-├── api/                     ← 백엔드 (Vercel Serverless Functions)
-│   ├── coach.py             ← AI 코칭 분석 엔드포인트 (/api/coach)
-│   └── news.py              ← 실시간 뉴스 RSS 파서 엔드포인트 (/api/news)
-│
-├── 02_source/               ← 프론트엔드 정적 파일 및 로컬 개발 도구
-│   ├── dev_server.py        ← 로컬 테스트용 개발 서버
-│   ├── css/
-│   │   └── style.css        ← 글래스모피즘 테마 + 반응형 레이아웃 스타일
-│   └── js/
-│       └── main.js          ← 폼 제출, fetch 호출, 에러 처리, 타임아웃 로직
-│
-└── 01_document/             ← 과제 제출용 문서 및 증빙 자료
-    ├── N2_A1-3 과제미션.txt
-    ├── ai_chat_history.md   ← AI 코딩 도구 협업 과정 증빙
-    └── screenshots/         ← 스크린샷 증빙 이미지
-        ├── desktop_view.png
-        ├── mobile_view.PNG
-        ├── ai_function_view.png
-        ├── empty_1.png
-        └── ai_function_error.png
-```
-
 > **핵심 구조 설명**: 프론트엔드(`index.html`, `css/`, `js/`)와 백엔드(`api/`)가 명확하게 분리되어 있습니다. Vercel은 `api/` 폴더 안의 Python 파일을 자동으로 서버리스 함수로 인식합니다.
 
 ---
