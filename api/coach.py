@@ -348,7 +348,10 @@ class handler(BaseHTTPRequestHandler):
             )
             
             # 다중 모델 fallback (429 쿼터나 404 방지)
-            candidate_models = ['gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-flash-latest']
+            # gemini-2.5-flash → 신규 사용자 404 폐지됨
+            # gemini-2.0-flash → Free Tier 일일 한도 초과 빈발
+            # gemini-2.5-flash-lite → 무료 티어 지원 안정 모델 (2025~)
+            candidate_models = ['gemini-2.5-flash-lite', 'gemini-2.0-flash-lite', 'gemini-1.5-flash', 'gemini-flash-latest']
             response = None
             last_exception = None
             
