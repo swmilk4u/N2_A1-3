@@ -5,8 +5,7 @@
 > 
 > * **배포 URL:** [https://swmilk4u-1.vercel.app](https://swmilk4u-1.vercel.app)
 > * **GitHub 저장소:** [https://github.com/swmilk4u/N2_A1-3](https://github.com/swmilk4u/N2_A1-3)
-*
-> * **노션 저장소:** [https://app.notion.com/p/3a5ce80de197806ab961ce5eadeb72bd)
+> * **노션 DB 저장소:** [https://app.notion.com/p/3a5ce80de197806ab961ce5eadeb72bd](https://app.notion.com/p/3a5ce80de197806ab961ce5eadeb72bd?v=3a5ce80de19780ff89e9000c9baf8581)
 
 ---
 
@@ -57,7 +56,7 @@
   * **🚀 포트폴리오 빌드업 스토리라인 전략**: 보유한 스택과 경험이 돋보이게 프로젝트를 구조화하는 맞춤형 가이드 라인(Markdown 형식).
 * **AI 백엔드 연동**:
   * 프론트엔드에서 `/api/coach`로 비동기 POST 전송.
-  * Vercel Serverless Function(Python) 내부에서 `google-genai` 라이브러리를 통해 최신 **Gemini 3.5 Flash** 모델 호출.
+  * Vercel Serverless Function(Python) 내부에서 `google-genai` 라이브러리를 통해 **Gemini Flash (`gemini-flash-latest`)** 모델 호출. (gemini-2.0-flash 우선 시도 후 gemini-flash-latest Fallback 적용)
 
 ### ⚠️ 예외 및 실패 처리 (UX 안전장치)
 1. **빈 입력 차단**: 필수 항목 중 하나라도 비어 있거나 공백만 전송될 시, 전송을 중단하고 경고 창(Toast 및 Error Banner)을 띄워 사용자 피드백을 제공합니다.
@@ -160,10 +159,12 @@ python 02_source/dev_server.py
 2. [Vercel Dashboard](https://vercel.com/dashboard)에 로그인한 뒤 **Add New > Project**를 선택하고, 본인의 GitHub 저장소(`N2_A1-3`)를 연동합니다.
 3. 빌드 설정은 기본값으로 유지하되, **Environment Variables** 항목에 다음과 같이 변수들을 추가해 줍니다.
    * **Key**: `GEMINI_API_KEY` (필수) / **Value**: *본인의 실제 Gemini API Key 값*
-   * **Key**: `SMTP_USER` (선택, 직접 이메일 전송용) / **Value**: *발신용 네이버 또는 구글 아이디 (예: `testuser`)*
-   * **Key**: `SMTP_PASSWORD` (선택, 직접 이메일 전송용) / **Value**: *네이버/구글 계정 설정에서 발급받은 '2차 인증 앱 비밀번호'*
-   * **Key**: `SMTP_SERVER` (선택, 기본값 `smtp.naver.com`) / **Value**: *발신 메일 SMTP 서버 도메인*
-   * **Key**: `SMTP_PORT` (선택, 기본값 `465` SSL) / **Value**: *SMTP 포트 번호*
+   * **Key**: `NOTION_API_KEY` (선택, 노션 DB 자동 적재용) / **Value**: *Notion Integrations에서 발급한 `ntn_...` 또는 `secret_...` 토큰*
+   * **Key**: `NOTION_DATABASE_ID` (선택, 노션 DB 자동 적재용) / **Value**: *연동할 노션 데이터베이스 ID (32자리 hex)*
+   * **Key**: `SMTP_USER` (선택, 직접 이메일 전송용) / **Value**: *발신용 구글 아이디 (예: `yourmail@gmail.com`)*
+   * **Key**: `SMTP_PASSWORD` (선택, 직접 이메일 전송용) / **Value**: *구글 계정 설정에서 발급받은 '앱 비밀번호' (2단계 인증 필요)*
+   * **Key**: `SMTP_SERVER` (선택, 기본값 `smtp.gmail.com`) / **Value**: *발신 메일 SMTP 서버 도메인*
+   * **Key**: `SMTP_PORT` (선택, 기본값 `587` TLS) / **Value**: *SMTP 포트 번호*
    * **Key**: `AUTO_WEBHOOK_URL` (선택, 외부 Webhook 알림용) / **Value**: *Discord, Slack 또는 Make.com Custom Webhook 주소*
 4. **Deploy** 버튼을 클릭하면 수초 내에 배포가 완료되며 고유한 Vercel URL이 생성됩니다!
 
@@ -255,7 +256,17 @@ python 02_source/dev_server.py
 ![데스크톱 뷰](01_document/screenshots/desktop_view.png)
 
 ### 📱 모바일 뷰 (Mobile View)
-![모바일 뷰](01_document/screenshots/mobile_view.png)
+![모바일 뷰](01_document/screenshots/mobile_view.PNG)
 
 ### ⚙️ AI 기능 분석 동작 화면 (AI Function View)
 ![AI 기능 분석 화면](01_document/screenshots/ai_function_view.png)
+
+### ⚠️ 빈 입력 실패 처리 화면 (Empty Input Error UX)
+> 필수값을 입력하지 않고 제출 시, 에러 배너 및 토스트 팝업으로 사용자에게 즉시 안내합니다.
+
+![빈 입력 에러 화면](01_document/screenshots/empty_1.png)
+
+### 🚫 API 오류 처리 화면 (API Error UX)
+> API 오류(4xx/5xx) 발생 시 적색 경고 배너로 상세 에러 정보를 제공합니다.
+
+![API 오류 에러 화면](01_document/screenshots/ai_function_error.png)
