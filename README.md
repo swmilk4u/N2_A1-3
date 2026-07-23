@@ -343,6 +343,8 @@ Vercel 프로젝트 설정 → **Environment Variables** 탭에서 아래 항목
 ⑤ JS: response.json() → marked.parse(data.result) → DOM 주입
 ```
 
+![fetch 요청 흐름 다이어그램](01_document/screenshots/fetch_flow.png)
+
 **Q7. 환경 변수를 쓰는 이유(보안/운영)?**
 
 - **보안**: API 키를 코드에 하드코딩하면 GitHub 공개 저장소를 크롤링하는 봇이 수 초 내에 탈취. 탈취된 키로 수십만 원의 무단 과금 발생 가능
