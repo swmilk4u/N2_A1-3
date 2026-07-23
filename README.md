@@ -297,7 +297,7 @@ Vercel 프로젝트 설정 → **Environment Variables** 탭에서 아래 항목
 
 ---
 
-### 📋 항목 1. 동작 확인 (PASS / FAIL)
+
 
 | 평가 항목 | 결과 | 근거 |
 |---|---|---|
@@ -311,7 +311,7 @@ Vercel 프로젝트 설정 → **Environment Variables** 탭에서 아래 항목
 
 ---
 
-### 💬 항목 2. 구조 설명 능력 (PASS / FAIL)
+
 
 **Q1. html/css/js/api 구조를 왜 이렇게 나눴는가?**
 
@@ -354,7 +354,7 @@ Vercel 프로젝트 설정 → **Environment Variables** 탭에서 아래 항목
 
 ---
 
-### 📚 항목 3. 개념 이해 (PASS / FAIL)
+
 
 **Q5. HTML/CSS/JavaScript의 역할 차이를 코드 예시로 설명하면?**
 
@@ -391,7 +391,7 @@ Vercel 프로젝트 설정 → **Environment Variables** 탭에서 아래 항목
 
 ---
 
-### 🚀 항목 4. 확장/개선 사고 (PASS / FAIL)
+
 
 **Q9. 응답 지연이 잦다면 어떤 개선 옵션을 고려할 수 있는가?**
 
