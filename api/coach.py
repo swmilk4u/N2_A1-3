@@ -232,14 +232,12 @@ def send_to_notion_database(email, job, skills, experience, ai_result):
         if matched_date_prop:
             properties_payload[matched_date_prop] = {"date": {"start": kst_now}}
     else:
-        # Fallback to standard property names
+        # Fallback to standard verified property names (avoiding non-existent '이메일' property error)
         properties_payload = {
             "희망 직무": {"title": [{"text": {"content": job}}]},
             "보유 기술": {"rich_text": [{"text": {"content": skills}}]},
             "핵심 경험": {"rich_text": [{"text": {"content": experience}}]}
         }
-        if email:
-            properties_payload["이메일"] = {"email": email}
 
     payload = {
         "parent": { "database_id": notion_db_id },
